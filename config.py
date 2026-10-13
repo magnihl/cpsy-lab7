@@ -70,3 +70,12 @@ KD = 0.0
 # below about 0.05 duty the motors do not turn at all
 DEADBAND = 0.05
 
+# measured across the wheel with a ruler, 13 Oct
+WHEEL_DIAMETER_CM = 4.8
+WHEEL_CIRCUMFERENCE_CM = 3.14159 * WHEEL_DIAMETER_CM   # 15.1 cm
+
+
+def rpm_to_cm_s(rpm):
+    """Wheel speed in rpm to ground speed in cm per second."""
+    return rpm / 60 * WHEEL_CIRCUMFERENCE_CM
+

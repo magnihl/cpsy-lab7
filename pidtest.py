@@ -13,8 +13,8 @@ Arguments are target, duration, then Kp Ki Kd. Overriding the gains on
 the command line means tuning does not need an edit and a push each
 time.
 
-On the floor, distance is target / 60 * duration wheel turns. 80 rpm for
-4 s is about 5 turns, roughly a metre on a 65 mm wheel.
+On the floor, distance is target / 60 * duration * 15.1 cm. 80 rpm for
+4 s is about 80 cm.
 
 Ctrl+C stops it, so does the e-stop button.
 """
@@ -40,7 +40,9 @@ kp, ki, kd = control.tunings
 turns = TARGET / 60 * DURATION
 print(f"target {TARGET:.0f} rpm for {DURATION:.0f} s, about {turns:.0f} "
       f"wheel turns   Kp {kp}  Ki {ki}  Kd {kd}")
-print("   t   left rpm  left duty   right rpm  right duty")
+print(f"target is {config.rpm_to_cm_s(TARGET):.0f} cm/s on a "
+      f"{config.WHEEL_DIAMETER_CM} cm wheel")
+print("   t   left rpm  left duty   right rpm  right duty    cm/s")
 
 try:
     estop.arm()
@@ -50,7 +52,9 @@ try:
         time.sleep(config.CONTROL_INTERVAL)
         (lr, ld), (rr, rd) = control.update()
         t = time.monotonic() - start
-        print(f"{t:5.1f} {lr:10.1f} {ld:10.3f}  {rr:10.1f} {rd:10.3f}")
+        cm_s = config.rpm_to_cm_s((lr + rr) / 2)
+        print(f"{t:5.1f} {lr:10.1f} {ld:10.3f}  {rr:10.1f} {rd:10.3f}"
+              f" {cm_s:7.1f}")
     control.stop()
 finally:
     estop.close()
