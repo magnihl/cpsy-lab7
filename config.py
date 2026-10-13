@@ -76,9 +76,8 @@ WHEEL_DIAMETER_CM = 4.8
 WHEEL_CIRCUMFERENCE_CM = 3.14159 * WHEEL_DIAMETER_CM   # 15.1 cm
 
 
-# centre to centre across the two wheels. NOT MEASURED YET, this is a
-# guess and every degrees per second figure depends on it
-TRACK_CM = 12.0
+# centre to centre across the two wheels, measured 13 Oct
+TRACK_CM = 10.8
 
 
 def rpm_to_cm_s(rpm):
