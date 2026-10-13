@@ -4,12 +4,19 @@
 WHEELS OFF THE GROUND for the first runs. The lab warns the controller
 can oscillate or run away, so keep a hand near the stop button.
 
-  python3 pidtest.py              hold 150 rpm with the gains in config
-  python3 pidtest.py 120          hold 120 rpm
-  python3 pidtest.py 120 0.002 0.004 0
+  python3 pidtest.py                    150 rpm for 15 s, config gains
+  python3 pidtest.py 80                 80 rpm for 15 s
+  python3 pidtest.py 80 4               80 rpm for 4 s
+  python3 pidtest.py 80 4 0.002 0.004 0 and these gains
 
-The last form overrides Kp Ki Kd without editing config, which is what
-you want while tuning. Ctrl+C stops it, so does the e-stop button.
+Arguments are target, duration, then Kp Ki Kd. Overriding the gains on
+the command line means tuning does not need an edit and a push each
+time.
+
+On the floor, distance is target / 60 * duration wheel turns. 80 rpm for
+4 s is about 5 turns, roughly a metre on a 65 mm wheel.
+
+Ctrl+C stops it, so does the e-stop button.
 """
 
 import sys
@@ -20,8 +27,8 @@ from estop import EStop
 from rover import disconnect, Rover, SpeedController, Wheel
 
 TARGET = float(sys.argv[1]) if len(sys.argv) > 1 else 150.0
-GAINS = tuple(float(a) for a in sys.argv[2:5]) if len(sys.argv) > 4 else None
-DURATION = 15.0
+DURATION = float(sys.argv[2]) if len(sys.argv) > 2 else 15.0
+GAINS = tuple(float(a) for a in sys.argv[3:6]) if len(sys.argv) > 5 else None
 
 estop = EStop()
 rover = Rover(estop)
@@ -30,7 +37,9 @@ right = Wheel(config.ENCODER_PIN_B)
 control = SpeedController(rover, left, right, GAINS)
 
 kp, ki, kd = control.tunings
-print(f"target {TARGET:.0f} rpm   Kp {kp}  Ki {ki}  Kd {kd}")
+turns = TARGET / 60 * DURATION
+print(f"target {TARGET:.0f} rpm for {DURATION:.0f} s, about {turns:.0f} "
+      f"wheel turns   Kp {kp}  Ki {ki}  Kd {kd}")
 print("   t   left rpm  left duty   right rpm  right duty")
 
 try:
