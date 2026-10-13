@@ -17,7 +17,7 @@ import time
 
 import config
 from estop import EStop
-from rover import Rover, SpeedController, Wheel
+from rover import disconnect, Rover, SpeedController, Wheel
 
 TARGET = float(sys.argv[1]) if len(sys.argv) > 1 else 150.0
 GAINS = tuple(float(a) for a in sys.argv[2:5]) if len(sys.argv) > 4 else None
@@ -45,3 +45,6 @@ try:
     control.stop()
 finally:
     estop.close()
+    left.close()
+    right.close()
+    disconnect()

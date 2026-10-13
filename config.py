@@ -57,9 +57,14 @@ CONTROL_INTERVAL = 0.05
 # near duty 0.15 is (159 - 91) / (0.20 - 0.10) = 680 rpm per unit duty,
 # which is where these starting gains come from: correcting a 20 rpm
 # error wants about 0.03 duty, so Kp is about 0.0015. started lower.
-# STARTING POINTS ONLY, the lab asks you to find these by experiment
-KP = 0.001
-KI = 0.002
+# TUNED 13 Oct, wheels off the ground, target 150 rpm. three runs:
+#   Kp 0.001 Ki 0.002   90% in 1.7 s, no overshoot, band 147-152
+#   Kp 0.002 Ki 0.004   90% in 0.3 s, slight dip,   band 146-156
+#   Kp 0.004 Ki 0.008   90% in 0.2 s, overshoots to 166 then rings
+#                       with a 0.35 to 0.4 s period, band 144-158
+# oscillation starts at 0.004, so back off to half of it
+KP = 0.002
+KI = 0.004
 KD = 0.0
 
 # below about 0.05 duty the motors do not turn at all

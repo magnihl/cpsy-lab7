@@ -14,7 +14,7 @@ import time
 
 import config
 from estop import EStop
-from rover import Rover, Wheel
+from rover import disconnect, Rover, Wheel
 
 DURATION = 1.5
 
@@ -45,3 +45,6 @@ try:
         print(f"{name:6} {rev:7.2f} rev   {way}")
 finally:
     estop.close()
+    left.close()
+    right.close()
+    disconnect()

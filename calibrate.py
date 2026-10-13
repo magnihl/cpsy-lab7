@@ -14,7 +14,7 @@ Ctrl+C stops it.
 import time
 
 import config
-from rover import Wheel
+from rover import Wheel, disconnect
 
 left = Wheel(config.ENCODER_PIN_A)
 right = Wheel(config.ENCODER_PIN_B)
@@ -23,6 +23,13 @@ right.reset()
 
 print("turn one wheel 5 full turns one way, then divide its count by 5")
 print("  left pulses   right pulses")
-while True:
-    time.sleep(0.5)
-    print(f"{left.pulses:13d} {right.pulses:14d}", end="\r", flush=True)
+try:
+    while True:
+        time.sleep(0.5)
+        print(f"{left.pulses:13d} {right.pulses:14d}", end="\r", flush=True)
+except KeyboardInterrupt:
+    print()
+finally:
+    left.close()
+    right.close()
+    disconnect()

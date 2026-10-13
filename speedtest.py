@@ -15,7 +15,7 @@ Ctrl+C stops it.
 import time
 
 import config
-from rover import Wheel
+from rover import disconnect, Wheel
 
 INTERVAL = 1.0
 
@@ -23,8 +23,15 @@ left = Wheel(config.ENCODER_PIN_A)
 right = Wheel(config.ENCODER_PIN_B)
 
 print("  left rev   left rpm    right rev   right rpm")
-while True:
-    time.sleep(INTERVAL)
-    lr, ls = left.rotations, left.speed()
-    rr, rs = right.rotations, right.speed()
-    print(f"{lr:10.2f} {ls:10.1f}   {rr:10.2f} {rs:10.1f}")
+try:
+    while True:
+        time.sleep(INTERVAL)
+        lr, ls = left.rotations, left.speed()
+        rr, rs = right.rotations, right.speed()
+        print(f"{lr:10.2f} {ls:10.1f}   {rr:10.2f} {rs:10.1f}")
+except KeyboardInterrupt:
+    pass
+finally:
+    left.close()
+    right.close()
+    disconnect()

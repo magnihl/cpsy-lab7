@@ -12,7 +12,7 @@ import time
 
 import config
 from estop import EStop
-from rover import Rover, Wheel
+from rover import disconnect, Rover, Wheel
 
 DURATION = 10.0
 
@@ -36,3 +36,6 @@ try:
           f"right {right.rotations / DURATION * 60:6.1f} rpm")
 finally:
     estop.close()
+    left.close()
+    right.close()
+    disconnect()

@@ -25,6 +25,18 @@ def _connect():
     return _pi
 
 
+def disconnect():
+    """Close the shared pigpio connection.
+
+    Without this, pigpio's own atexit handler runs after the socket has
+    gone and prints a Bad file descriptor traceback.
+    """
+    global _pi
+    if _pi is not None:
+        _pi.stop()
+        _pi = None
+
+
 class Wheel:
     """Odometer and speedometer for one wheel.
 

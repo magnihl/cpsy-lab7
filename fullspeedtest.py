@@ -14,7 +14,7 @@ import time
 
 import config
 from estop import EStop
-from rover import Rover, Wheel
+from rover import disconnect, Rover, Wheel
 
 DUTIES = (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.5, 1.0)
 SETTLE = 1.0
@@ -38,3 +38,6 @@ try:
     rover.stop()
 finally:
     estop.close()
+    left.close()
+    right.close()
+    disconnect()
