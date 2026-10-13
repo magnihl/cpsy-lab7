@@ -26,10 +26,12 @@ SLEEP_PIN = "GPIO25"
 STOP_PIN = "GPIO4"
 IR_CHANNEL = 0
 
-# measured 13 Oct with calibrate.py: 3475 edges over 5 hand turns of the
-# left wheel. the Lab 6 page's "about 700 pulses" is one channel's
-# rising edges, not the quadrature total
-PULSES_PER_REV = 695
+# measured 13 Oct with calibrate.py over 5 hand turns per wheel:
+# left 3475 edges, right 3450, so (3475 + 3450) / 10. the two agree to
+# 0.7 percent, inside hand turning error, so one constant serves both.
+# the Lab 6 page's "about 700 pulses" is one channel's rising edges,
+# not the quadrature total
+PULSES_PER_REV = 693
 
 SPEED = 0.5
 
