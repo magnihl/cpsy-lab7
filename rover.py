@@ -151,6 +151,7 @@ class SpeedController:
                 output_limits=(0.0, 1.0))
             for _ in self._motors
         )
+        self._forward = [True, True]
 
     @property
     def tunings(self):
@@ -162,21 +163,41 @@ class SpeedController:
             pid.tunings = gains
 
     def target(self, left_rpm, right_rpm=None):
-        """Set the wanted speed. One value sets both wheels."""
+        """Set the wanted speed per wheel. One value sets both.
+
+        Signed: negative drives that wheel backwards. Equal and opposite
+        spins the rover on the spot, unequal and same sign turns it in
+        an arc.
+        """
         if right_rpm is None:
             right_rpm = left_rpm
-        for pid, rpm in zip(self._pids, (left_rpm, right_rpm)):
-            pid.setpoint = rpm
+        for i, rpm in enumerate((left_rpm, right_rpm)):
+            forward = rpm >= 0
+            if forward != self._forward[i]:
+                # the integral built up driving the other way means
+                # nothing now, and would fight the new direction
+                self._pids[i].reset()
+                self._forward[i] = forward
+            # the wheel tally is unsigned, so the PID works on magnitude
+            self._pids[i].setpoint = abs(rpm)
 
     def update(self):
-        """Run one control step. Returns (rpm, duty) for each wheel."""
+        """Run one control step. Returns (rpm, duty) for each wheel.
+
+        rpm is unsigned, matching what the encoder can report.
+        """
+        armed = self._rover._estop.armed
         out = []
-        for pid, wheel, motor in zip(self._pids, self._wheels, self._motors):
+        for i, (pid, wheel, motor) in enumerate(
+                zip(self._pids, self._wheels, self._motors)):
             rpm = wheel.speed()
             duty = pid(rpm)
-            if not self._rover._estop.armed:
+            if not armed:
                 duty = 0.0
-            motor.forward(duty)
+            if self._forward[i]:
+                motor.forward(duty)
+            else:
+                motor.backward(duty)
             out.append((rpm, duty))
         return out
 
@@ -184,4 +205,5 @@ class SpeedController:
         for pid in self._pids:
             pid.reset()
             pid.setpoint = 0.0
+        self._forward = [True, True]
         self._rover.stop()

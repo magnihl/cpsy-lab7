@@ -1,3 +1,4 @@
+import math
 import os
 
 # gpiozero resolves this when the first device is created, so setting it
@@ -75,7 +76,22 @@ WHEEL_DIAMETER_CM = 4.8
 WHEEL_CIRCUMFERENCE_CM = 3.14159 * WHEEL_DIAMETER_CM   # 15.1 cm
 
 
+# centre to centre across the two wheels. NOT MEASURED YET, this is a
+# guess and every degrees per second figure depends on it
+TRACK_CM = 12.0
+
+
 def rpm_to_cm_s(rpm):
     """Wheel speed in rpm to ground speed in cm per second."""
     return rpm / 60 * WHEEL_CIRCUMFERENCE_CM
+
+
+def turn_rate_deg_s(left_rpm, right_rpm, track_cm=TRACK_CM):
+    """Signed wheel speeds to how fast the rover rotates, degrees/s.
+
+    Positive is a left turn. A spin on the spot is equal and opposite
+    wheel speeds, which gives twice the rate of one wheel alone.
+    """
+    diff = rpm_to_cm_s(right_rpm) - rpm_to_cm_s(left_rpm)
+    return math.degrees(diff / track_cm)
 
