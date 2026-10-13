@@ -17,7 +17,10 @@ ENCODER_B = ("GPIO16", "GPIO26")
 # C1 only, one channel per wheel. counted by pigpio's tally in C, which
 # never wakes Python. no direction, the commanded direction gives that
 ENCODER_PIN_A = "GPIO5"
-ENCODER_PIN_B = "GPIO16"
+# GPIO16 is motor B's C1 on paper but reads no edges at all, 13 Oct, so
+# the right wheel uses C2 instead. likely a loose jumper on Pi pin 36.
+# single channel counting does not care which of the two it uses
+ENCODER_PIN_B = "GPIO26"
 
 SLEEP_PIN = "GPIO25"
 STOP_PIN = "GPIO4"
