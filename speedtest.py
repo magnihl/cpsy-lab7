@@ -3,8 +3,10 @@
 
 Turn a wheel by hand, or drive the rover, and watch the numbers.
 
-UNPLUG BOTH MOTORS FROM THE DRIVER BEFORE TURNING THEM BY HAND. A
-spun motor feeds current back into the DRV8833 and can damage it.
+To turn a wheel by hand, leave everything plugged in and just do not
+run rc.py. The motor and encoder share one cable, so unplugging the
+motor unpowers the encoder. GPIO25 has an internal pull down, so with
+nothing driving SLP the DRV8833 stays asleep.
 
 Run on the Pi:  python3 speedtest.py
 Ctrl+C stops it.
