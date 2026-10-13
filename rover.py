@@ -14,16 +14,18 @@ class Wheel:
     in rotations per minute.
     """
 
-    def __init__(self, pins, pulses_per_rev=config.PULSES_PER_REV):
+    def __init__(self, pins, sign=1, pulses_per_rev=config.PULSES_PER_REV):
         self._encoder = RotaryEncoder(*pins, max_steps=0)
         self._ppr = pulses_per_rev
+        # +1 or -1, so forward reads positive on both sides
+        self._sign = sign
         self._last_steps = 0
         self._last_time = time.monotonic()
 
     @property
     def rotations(self):
         """Total rotations since start. Negative means backwards."""
-        return self._encoder.steps / self._ppr
+        return self._sign * self._encoder.steps / self._ppr
 
     def speed(self):
         """Rotations per minute since the last call to speed().
@@ -33,7 +35,7 @@ class Wheel:
         matters once a PID is reading this.
         """
         now = time.monotonic()
-        steps = self._encoder.steps
+        steps = self._sign * self._encoder.steps
 
         elapsed = now - self._last_time
         moved = steps - self._last_steps
