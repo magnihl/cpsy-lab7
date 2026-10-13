@@ -19,6 +19,7 @@ On the floor, distance is target / 60 * duration * 15.1 cm. 80 rpm for
 Ctrl+C stops it, so does the e-stop button.
 """
 
+import csv
 import sys
 import time
 
@@ -44,6 +45,9 @@ print(f"target is {config.rpm_to_cm_s(TARGET):.0f} cm/s on a "
       f"{config.WHEEL_DIAMETER_CM} cm wheel")
 print("   t   left rpm  left duty   right rpm  right duty    cm/s")
 
+name = f"pid_{TARGET:.0f}_{kp}_{ki}_{kd}.csv"
+rows = []
+
 try:
     estop.arm()
     control.target(TARGET)
@@ -53,9 +57,16 @@ try:
         (lr, ld), (rr, rd) = control.update()
         t = time.monotonic() - start
         cm_s = config.rpm_to_cm_s((lr + rr) / 2)
+        rows.append((round(t, 3), round(lr, 1), round(ld, 4),
+                     round(rr, 1), round(rd, 4)))
         print(f"{t:5.1f} {lr:10.1f} {ld:10.3f}  {rr:10.1f} {rd:10.3f}"
               f" {cm_s:7.1f}")
     control.stop()
+    with open(name, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["t", "left_rpm", "left_duty", "right_rpm", "right_duty"])
+        w.writerows(rows)
+    print(f"wrote {name}")
 finally:
     estop.close()
     left.close()

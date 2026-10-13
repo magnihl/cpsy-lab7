@@ -10,6 +10,7 @@ this works at one speed and oscillates at others.
 Run on the Pi:  python3 fullspeedtest.py
 """
 
+import csv
 import time
 
 import config
@@ -28,14 +29,22 @@ right = Wheel(config.ENCODER_PIN_B)
 try:
     estop.arm()
     print(" duty    left rpm   right rpm")
+    rows = []
     for duty in DUTIES:
         rover.forward(duty)
         time.sleep(SETTLE)
         left.speed()
         right.speed()
         time.sleep(MEASURE)
-        print(f"{duty:5.2f} {left.speed():11.1f} {right.speed():11.1f}")
+        lr, rr = left.speed(), right.speed()
+        rows.append((duty, round(lr, 1), round(rr, 1)))
+        print(f"{duty:5.2f} {lr:11.1f} {rr:11.1f}")
     rover.stop()
+    with open("plant.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["duty", "left_rpm", "right_rpm"])
+        w.writerows(rows)
+    print("wrote plant.csv")
 finally:
     estop.close()
     left.close()
