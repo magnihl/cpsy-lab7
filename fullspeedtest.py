@@ -3,7 +3,9 @@
 
 WHEELS OFF THE GROUND.
 
-Tells you the usable speed range before any PID is tuned against it.
+Maps the plant: what duty produces what speed, where the motor stops
+responding at the bottom, and how flat the top is. A PID tuned without
+this works at one speed and oscillates at others.
 
 Run on the Pi:  python3 fullspeedtest.py
 """
@@ -14,7 +16,7 @@ import config
 from estop import EStop
 from rover import Rover, Wheel
 
-DUTIES = (0.3, 0.5, 0.7, 1.0)
+DUTIES = (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.5, 1.0)
 SETTLE = 1.0
 MEASURE = 2.0
 
