@@ -34,7 +34,7 @@ try:
         left.speed()
         right.speed()
         time.sleep(MEASURE)
-        print(f"{duty:5.1f} {left.speed():11.1f} {right.speed():11.1f}")
+        print(f"{duty:5.2f} {left.speed():11.1f} {right.speed():11.1f}")
     rover.stop()
 finally:
     estop.close()
