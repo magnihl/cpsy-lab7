@@ -19,8 +19,8 @@ from rover import Wheel
 
 INTERVAL = 1.0
 
-left = Wheel(config.ENCODER_A, config.ENCODER_A_SIGN)
-right = Wheel(config.ENCODER_B, config.ENCODER_B_SIGN)
+left = Wheel(config.ENCODER_PIN_A)
+right = Wheel(config.ENCODER_PIN_B)
 
 print("  left rev   left rpm    right rev   right rpm")
 while True:

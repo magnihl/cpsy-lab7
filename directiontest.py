@@ -20,8 +20,8 @@ DURATION = 1.5
 
 estop = EStop()
 rover = Rover(estop)
-left = Wheel(config.ENCODER_A, config.ENCODER_A_SIGN)
-right = Wheel(config.ENCODER_B, config.ENCODER_B_SIGN)
+left = Wheel(config.ENCODER_PIN_A)
+right = Wheel(config.ENCODER_PIN_B)
 
 try:
     estop.arm()

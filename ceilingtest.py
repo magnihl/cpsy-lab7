@@ -5,7 +5,7 @@ WHEELS OFF THE GROUND. Put a piece of tape on the left tyre and count
 how many times it comes round by eye, then compare with the number
 printed. If the eye count is much higher, the encoder is losing pulses.
 
-Run on the Pi:  GPIOZERO_PIN_FACTORY=pigpio python3 ceilingtest.py
+Run on the Pi:  python3 ceilingtest.py
 """
 
 import time
@@ -18,8 +18,8 @@ DURATION = 10.0
 
 estop = EStop()
 rover = Rover(estop)
-left = Wheel(config.ENCODER_A, config.ENCODER_A_SIGN)
-right = Wheel(config.ENCODER_B, config.ENCODER_B_SIGN)
+left = Wheel(config.ENCODER_PIN_A)
+right = Wheel(config.ENCODER_PIN_B)
 
 try:
     estop.arm()
