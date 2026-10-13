@@ -23,10 +23,10 @@ SLEEP_PIN = "GPIO25"
 STOP_PIN = "GPIO4"
 IR_CHANNEL = 0
 
-# NEEDS RECALIBRATING. 700 was the quadrature figure from the Lab 6
-# page. Counting one channel's rising edges gives a different number.
-# Run calibrate.py, turn a wheel 5 times one way, divide by 5.
-PULSES_PER_REV = 700
+# measured 13 Oct with calibrate.py: 3475 edges over 5 hand turns of the
+# left wheel. the Lab 6 page's "about 700 pulses" is one channel's
+# rising edges, not the quadrature total
+PULSES_PER_REV = 695
 
 SPEED = 0.5
 
