@@ -42,3 +42,26 @@ FIRST_HOLD = 0.7
 REPEAT_GAP = 0.25
 
 DEBOUNCE = 0.05
+
+# --- speed control -------------------------------------------------
+# control loop period. at 150 rpm and 693 pulses a revolution a 0.05 s
+# window holds about 87 pulses, so speed is quantised to about 1 percent
+CONTROL_INTERVAL = 0.05
+
+# measured 13 Oct, wheels off the ground, duty to rpm:
+#   0.05   15 / 10      0.25   175 / 177
+#   0.10   91 / 96      0.30   187 / 189
+#   0.15  134 / 138     0.50   212 / 211
+#   0.20  159 / 162     1.00   234 / 228
+# the plant is steep at the bottom and nearly flat above 0.3. local gain
+# near duty 0.15 is (159 - 91) / (0.20 - 0.10) = 680 rpm per unit duty,
+# which is where these starting gains come from: correcting a 20 rpm
+# error wants about 0.03 duty, so Kp is about 0.0015. started lower.
+# STARTING POINTS ONLY, the lab asks you to find these by experiment
+KP = 0.001
+KI = 0.002
+KD = 0.0
+
+# below about 0.05 duty the motors do not turn at all
+DEADBAND = 0.05
+

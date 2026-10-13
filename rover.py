@@ -7,6 +7,8 @@ import config  # sets the pin factory, import before gpiozero
 import pigpio
 from gpiozero import Motor, Robot
 
+from vendor.simple_pid import PID
+
 _pi = None
 
 
@@ -88,7 +90,11 @@ class Wheel:
 
 class Rover:
     def __init__(self, estop, motor_a=config.MOTOR_A, motor_b=config.MOTOR_B):
-        self._robot = Robot(left=Motor(**motor_a), right=Motor(**motor_b))
+        # kept as separate attributes as well as inside Robot, because
+        # closed loop control sets each wheel's duty independently
+        self.left_motor = Motor(**motor_a)
+        self.right_motor = Motor(**motor_b)
+        self._robot = Robot(left=self.left_motor, right=self.right_motor)
         self._estop = estop
 
     def forward(self, speed=config.SPEED):
@@ -110,3 +116,60 @@ class Rover:
         if not self._estop.armed:
             return
         action(speed)
+
+
+class SpeedController:
+    """Closed loop speed control, one PID per wheel.
+
+    The two wheels differ by about 55 percent at duty 0.05 and 2 percent
+    at duty 1.0, so they need separate controllers rather than one for
+    the pair.
+
+    Forward only. The wheel tally has no sign, so a reversing controller
+    would need the quadrature channel back.
+    """
+
+    def __init__(self, rover, left_wheel, right_wheel, gains=None):
+        kp, ki, kd = gains if gains else (config.KP, config.KI, config.KD)
+        self._rover = rover
+        self._wheels = (left_wheel, right_wheel)
+        self._motors = (rover.left_motor, rover.right_motor)
+        self._pids = tuple(
+            PID(kp, ki, kd, setpoint=0.0, sample_time=None,
+                output_limits=(0.0, 1.0))
+            for _ in self._motors
+        )
+
+    @property
+    def tunings(self):
+        return self._pids[0].tunings
+
+    @tunings.setter
+    def tunings(self, gains):
+        for pid in self._pids:
+            pid.tunings = gains
+
+    def target(self, left_rpm, right_rpm=None):
+        """Set the wanted speed. One value sets both wheels."""
+        if right_rpm is None:
+            right_rpm = left_rpm
+        for pid, rpm in zip(self._pids, (left_rpm, right_rpm)):
+            pid.setpoint = rpm
+
+    def update(self):
+        """Run one control step. Returns (rpm, duty) for each wheel."""
+        out = []
+        for pid, wheel, motor in zip(self._pids, self._wheels, self._motors):
+            rpm = wheel.speed()
+            duty = pid(rpm)
+            if not self._rover._estop.armed:
+                duty = 0.0
+            motor.forward(duty)
+            out.append((rpm, duty))
+        return out
+
+    def stop(self):
+        for pid in self._pids:
+            pid.reset()
+            pid.setpoint = 0.0
+        self._rover.stop()
